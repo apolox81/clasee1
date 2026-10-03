@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avalestics · Asistente</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div>
+          <h1>Avalestics</h1>
+          <p>Asistente inteligente</p>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <span class="dot" id="statusDot"></span>
+        <div>
+          <strong id="statusText">Conectando…</strong>
+          <small id="statusSub">Microsoft Copilot Studio</small>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-btn" id="btnReload"><span>⟳</span> Reiniciar conversación</button>
+        <button class="menu-btn" id="btnFullscreen"><span>⛶</span> Pantalla completa</button>
+        <button class="menu-btn" id="btnTheme"><span>◐</span> Cambiar tema</button>
+        <button class="menu-btn" id="btnNewTab"><span>↗</span> Abrir en pestaña nueva</button>
+      </nav>
+
+      <div class="tips">
+        <h2>Consejos</h2>
+        <ul>
+          <li>Haz preguntas claras y específicas.</li>
+          <li>Puedes pedir resúmenes, conceptos o análisis.</li>
+          <li>Si se queda pegado, reinicia la conversación.</li>
+        </ul>
+      </div>
+
+      <footer class="side-foot">Avalestics © <span id="year"></span></footer>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn burger" id="btnMenu" aria-label="Menú">☰</button>
+        <div class="title">
+          <h2>Chat con Avalestics</h2>
+          <span id="clock"></span>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="btnReloadTop" title="Reiniciar">⟳</button>
+          <button class="icon-btn" id="btnFullscreenTop" title="Pantalla completa">⛶</button>
+        </div>
+      </header>
+
+      <section class="chat-wrap">
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <p>Cargando el asistente…</p>
+        </div>
+        <div class="error hidden" id="error">
+          <h3>No se pudo cargar el asistente</h3>
+          <p>Revisa tu conexión a internet o que el agente esté publicado y compartido.</p>
+          <button class="primary" id="btnRetry">Reintentar</button>
+        </div>
+        <iframe id="chat" title="Avalestics Copilot" allow="clipboard-write; microphone"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
