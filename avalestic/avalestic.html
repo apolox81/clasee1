@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avalestics · Asistente</title>
+  <style>
+:root{
+  --bg:#0b1020; --panel:rgba(255,255,255,.06); --border:rgba(255,255,255,.12);
+  --text:#e8ecf8; --muted:#9aa4c4; --accent:#6c8cff; --accent2:#9b6cff; --ok:#38d39f; --err:#ff6b6b;
+}
+[data-theme="light"]{
+  --bg:#eef1fb; --panel:rgba(255,255,255,.75); --border:rgba(20,30,70,.12);
+  --text:#1a2040; --muted:#5b6485;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;transition:background .3s}
+.hidden{display:none!important}
+
+.bg-orbs span{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;pointer-events:none}
+.bg-orbs span:nth-child(1){width:420px;height:420px;background:var(--accent);top:-120px;left:-80px}
+.bg-orbs span:nth-child(2){width:380px;height:380px;background:var(--accent2);bottom:-120px;right:-60px}
+.bg-orbs span:nth-child(3){width:260px;height:260px;background:#26c6da;top:40%;left:45%;opacity:.15}
+
+.app{position:relative;z-index:1;display:flex;height:100%;gap:16px;padding:16px}
+
+.sidebar{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:20px;padding:22px;
+  background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px rgba(108,140,255,.45)}
+.brand h1{margin:0;font-size:20px}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+
+.status-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px}
+.status-card small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.dot{width:10px;height:10px;border-radius:50%;background:#e0b341;box-shadow:0 0 0 4px rgba(224,179,65,.2);animation:pulse 1.4s infinite}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 4px rgba(56,211,159,.2);animation:none}
+.dot.err{background:var(--err);box-shadow:0 0 0 4px rgba(255,107,107,.2);animation:none}
+@keyframes pulse{50%{opacity:.4}}
+
+.menu{display:flex;flex-direction:column;gap:8px}
+.menu-btn{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid transparent;border-radius:12px;
+  background:transparent;color:var(--text);font:inherit;font-size:14px;cursor:pointer;text-align:left;transition:.2s}
+.menu-btn span{width:22px;text-align:center;color:var(--accent);font-size:17px}
+.menu-btn:hover{background:var(--panel);border-color:var(--border);transform:translateX(3px)}
+
+.tips{padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(108,140,255,.15),rgba(155,108,255,.12));border:1px solid var(--border)}
+.tips h2{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tips ul{margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--muted)}
+.side-foot{margin-top:auto;font-size:12px;color:var(--muted);text-align:center}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:var(--panel);
+  border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(18px)}
+.title{flex:1}
+.title h2{margin:0;font-size:17px}
+.title span{font-size:12px;color:var(--muted);text-transform:capitalize}
+.top-actions{display:flex;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--text);
+  font-size:17px;cursor:pointer;transition:.2s}
+.icon-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.burger{display:none}
+
+.chat-wrap{position:relative;flex:1;border-radius:22px;overflow:hidden;border:1px solid var(--border);
+  background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#chat{width:100%;height:100%;border:0;display:block;opacity:0;transition:opacity .4s}
+#chat.ready{opacity:1}
+
+.loader,.error{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:var(--bg);color:var(--text);text-align:center;padding:24px;z-index:2}
+.loader.done{opacity:0;pointer-events:none;transition:opacity .4s}
+.spinner{width:46px;height:46px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error p{color:var(--muted);max-width:380px;margin:0}
+.primary{padding:11px 26px;border:0;border-radius:12px;color:#fff;font:inherit;font-weight:600;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2))}
+
+.app.full .sidebar,.app.full .topbar{display:none}
+.app.full{padding:0}
+.app.full .chat-wrap{border-radius:0;border:0}
+
+@media (max-width:860px){
+  .app{padding:10px;gap:10px}
+  .sidebar{position:fixed;z-index:10;top:10px;bottom:10px;left:10px;transform:translateX(-120%);transition:transform .3s;
+    background:var(--bg);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .sidebar.open{transform:none}
+  .burger{display:block}
+}
+</style>
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div>
+          <h1>Avalestics</h1>
+          <p>Asistente inteligente</p>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <span class="dot" id="statusDot"></span>
+        <div>
+          <strong id="statusText">Conectando…</strong>
+          <small id="statusSub">Microsoft Copilot Studio</small>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-btn" id="btnReload"><span>⟳</span> Reiniciar conversación</button>
+        <button class="menu-btn" id="btnFullscreen"><span>⛶</span> Pantalla completa</button>
+        <button class="menu-btn" id="btnTheme"><span>◐</span> Cambiar tema</button>
+        <button class="menu-btn" id="btnNewTab"><span>↗</span> Abrir en pestaña nueva</button>
+      </nav>
+
+      <div class="tips">
+        <h2>Consejos</h2>
+        <ul>
+          <li>Haz preguntas claras y específicas.</li>
+          <li>Puedes pedir resúmenes, conceptos o análisis.</li>
+          <li>Si se queda pegado, reinicia la conversación.</li>
+        </ul>
+      </div>
+
+      <footer class="side-foot">Avalestics © <span id="year"></span></footer>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn burger" id="btnMenu" aria-label="Menú">☰</button>
+        <div class="title">
+          <h2>Chat con Avalestics</h2>
+          <span id="clock"></span>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="btnReloadTop" title="Reiniciar">⟳</button>
+          <button class="icon-btn" id="btnFullscreenTop" title="Pantalla completa">⛶</button>
+        </div>
+      </header>
+
+      <section class="chat-wrap">
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <p>Cargando el asistente…</p>
+        </div>
+        <div class="error hidden" id="error">
+          <h3>No se pudo cargar el asistente</h3>
+          <p>Revisa tu conexión a internet o que el agente esté publicado y compartido.</p>
+          <button class="primary" id="btnRetry">Reintentar</button>
+        </div>
+        <iframe id="chat" title="Avalestics Copilot" allow="clipboard-write; microphone"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <script>
+(() => {
+  const CHAT_URL = "https://copilotstudio.microsoft.com/environments/fcb908f6-0b5b-e8c8-aeff-53f2c0aa0618/bots/cr9a0_avalestics_g4cDe9/webchat?__version__=2&enableFileAttachment=false&cliAgent=true";
+  const $ = id => document.getElementById(id);
+  const frame = $("chat"), loader = $("loader"), errBox = $("error");
+  const dot = $("statusDot"), statusText = $("statusText"), statusSub = $("statusSub");
+  let timer;
+
+  function setStatus(kind, text, sub) {
+    dot.className = "dot " + kind;
+    statusText.textContent = text;
+    statusSub.textContent = sub;
+  }
+
+  function load() {
+    clearTimeout(timer);
+    frame.classList.remove("ready");
+    loader.classList.remove("done");
+    errBox.classList.add("hidden");
+    setStatus("", "Conectando…", "Microsoft Copilot Studio");
+    frame.src = "about:blank";
+    setTimeout(() => { frame.src = CHAT_URL; }, 50);
+    timer = setTimeout(() => {
+      if (!frame.classList.contains("ready")) fail();
+    }, 30000);
+  }
+
+  function fail() {
+    errBox.classList.remove("hidden");
+    setStatus("err", "Sin conexión", "No se pudo cargar");
+  }
+
+  frame.addEventListener("load", () => {
+    if (frame.src === "about:blank" || !frame.src.includes("copilotstudio")) return;
+    clearTimeout(timer);
+    frame.classList.add("ready");
+    loader.classList.add("done");
+    setStatus("ok", "En línea", "Avalestics listo");
+  });
+
+  window.addEventListener("offline", fail);
+  window.addEventListener("online", load);
+
+  // Pantalla completa (modo inmersivo)
+  function toggleFull() {
+    const app = $("app");
+    app.classList.toggle("full");
+    if (app.classList.contains("full")) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    }
+  }
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") $("app").classList.remove("full");
+  });
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) $("app").classList.remove("full");
+  });
+
+  // Tema
+  const saved = localStorage.getItem("avalestic-theme");
+  if (saved) document.documentElement.dataset.theme = saved;
+  function toggleTheme() {
+    const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem("avalestic-theme", t);
+  }
+
+  // Reloj
+  function tick() {
+    $("clock").textContent = new Date().toLocaleString("es-CO", {
+      weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
+    });
+  }
+  tick(); setInterval(tick, 30000);
+  $("year").textContent = new Date().getFullYear();
+
+  $("btnReload").onclick = $("btnReloadTop").onclick = $("btnRetry").onclick = load;
+  $("btnFullscreen").onclick = $("btnFullscreenTop").onclick = toggleFull;
+  $("btnTheme").onclick = toggleTheme;
+  $("btnNewTab").onclick = () => window.open(CHAT_URL, "_blank", "noopener");
+  $("btnMenu").onclick = () => $("sidebar").classList.toggle("open");
+
+  load();
+})();
+</script>
+</body>
+</html>
